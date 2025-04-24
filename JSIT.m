@@ -73,8 +73,8 @@ function [] = JSIT(fov,codebook,predicted_folder)
     
     
     imwrite(dIm,fullfile(predicted_folder,'unfiltered_predictions.tiff'));
-    imwrite(iIm,fullfile(predicted_folder,"spot_predictions.tiff"));
-    writematrix(qqt,fullfile(predicted_folder,"barcodes_with_blanks.csv"));
-    writematrix(qqct,fullfile(predicted_folder,"barcodes_wo_blanks.csv"));
+    imwrite(iIm,fullfile(predicted_folder,'spot_predictions.tiff'));
+    writematrix(qqt,fullfile(predicted_folder,'barcodes_with_blanks.csv'));
+    writematrix(qqct,fullfile(predicted_folder,'barcodes_wo_blanks.csv'));
 
 end
