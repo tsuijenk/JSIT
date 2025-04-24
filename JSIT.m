@@ -98,6 +98,7 @@ function [] = JSIT(fov,codebook,predicted_folder)
         else
             fprintf('Failed to save: %s\n', file_path);
         end
+    end
 
 
     %% Explicitly exit the MATLAB runtime to avoid hanging jobs
