@@ -64,9 +64,19 @@ Run the program using:
 
 ---
 
-### Notes
+### Notes (1)
 
 - Do **not** run `./JSIT` directly — use `run_run_JSIT_wrapper.sh`
 - You **do not need a MATLAB license** to run after compilation
 - Make sure all input/output paths are accessible from compute nodes
 - If you see a `CTF not found` error, make sure `JSIT.ctf` is in the same directory as `JSIT`
+
+
+### Notes (2)
+
+Example code to run JSIT.m without compiling (using a MATLAB interpreter)
+
+```bash
+/gsc/software/linux-x86_64-centos6/matlab-r2016a/bin/matlab -nodisplay -nosplash -r "JSIT(/path/to/aligned_images_{fov:03}_{z:02}.tiff.mat', /path/to/codebook.mat, /path/to/output_folder_{fov:03}_{z:02}); quit;"
+```
+
