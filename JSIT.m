@@ -78,4 +78,7 @@ function [] = JSIT(fov,codebook,predicted_folder)
     writematrix(qqt,fullfile(predicted_folder,'barcodes_with_blanks.csv'));
     writematrix(qqct,fullfile(predicted_folder,'barcodes_wo_blanks.csv'));
 
+    %% Explicitly exit the MATLAB runtime to avoid hanging jobs
+    exit;
+
 end
