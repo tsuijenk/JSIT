@@ -82,6 +82,24 @@ function [] = JSIT(fov,codebook,predicted_folder)
     dlmwrite(fullfile(predicted_folder, 'barcodes_with_blanks.csv'), qqt, 'delimiter', ',');
     dlmwrite(fullfile(predicted_folder, 'barcodes_wo_blanks.csv'), qqct, 'delimiter', ',');
 
+
+    % Verify and print status
+    file_list = {
+        'unfiltered_predictions.tiff'
+        'spot_predictions.tiff'
+        'barcodes_with_blanks.csv'
+        'barcodes_wo_blanks.csv'
+    };
+    
+    for i = 1:length(file_list)
+        file_path = fullfile(predicted_folder, file_list{i});
+        if exist(file_path, 'file')
+            fprintf('Successfully saved: %s\n', file_path);
+        else
+            fprintf('Failed to save: %s\n', file_path);
+        end
+
+
     %% Explicitly exit the MATLAB runtime to avoid hanging jobs
     exit;
 
