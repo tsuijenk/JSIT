@@ -5,6 +5,9 @@ function [] = JSIT(fov,codebook,predicted_folder)
     %% Load data
     Ic = struct2cell(load(fov));
     Cc = struct2cell(load(codebook));
+    
+    disp('Loaded input files');
+
     I = double(Ic{:});
     C = double(Cc{:});
     
