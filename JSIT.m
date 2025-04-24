@@ -71,6 +71,7 @@ function [] = JSIT(fov,codebook,predicted_folder)
     tgt = 0.05;
     [qqt,qqct] = getThresholdHist(q,nA,nI,nX,nC,nB,tgt);
     
+    mkdir(predicted_folder)
     
     imwrite(dIm,fullfile(predicted_folder,'unfiltered_predictions.tiff'));
     imwrite(iIm,fullfile(predicted_folder,'spot_predictions.tiff'));
