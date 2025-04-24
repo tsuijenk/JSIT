@@ -74,8 +74,9 @@ function [] = JSIT(fov,codebook,predicted_folder)
     tgt = 0.05;
     [qqt,qqct] = getThresholdHist(q,nA,nI,nX,nC,nB,tgt);
     
-    mkdir(predicted_folder)
-    
+    if ~exist(predicted_folder, 'dir')
+        mkdir(predicted_folder);
+        
     imwrite(dIm,fullfile(predicted_folder,'unfiltered_predictions.tiff'));
     imwrite(iIm,fullfile(predicted_folder,'spot_predictions.tiff'));
     dlmwrite(fullfile(predicted_folder, 'barcodes_with_blanks.csv'), qqt, 'delimiter', ',');
