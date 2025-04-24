@@ -59,7 +59,7 @@ function [] = JSIT(fov,codebook,predicted_folder)
     Xf = enforceSparsity2(X,k,t);
     xIm = reshape(sum(Xf,2),[sz1*sf,sz2*sf]);
     Icv = reshape(Ic,[sz1*sz2,16]);
-    iv = vecnorm(double(Icv)',2)';
+    iv = sqrt(sum(double(Icv).^2, 2));
     iIm = reshape(iv,[sz1,sz2]);
     iIm = imresize(iIm,sf);
     dIm = X2dIm(Xf,sz1*sf,sz2*sf);
@@ -78,8 +78,8 @@ function [] = JSIT(fov,codebook,predicted_folder)
     
     imwrite(dIm,fullfile(predicted_folder,'unfiltered_predictions.tiff'));
     imwrite(iIm,fullfile(predicted_folder,'spot_predictions.tiff'));
-    writematrix(qqt,fullfile(predicted_folder,'barcodes_with_blanks.csv'));
-    writematrix(qqct,fullfile(predicted_folder,'barcodes_wo_blanks.csv'));
+    dlmwrite(fullfile(predicted_folder, 'barcodes_with_blanks.csv'), qqt, 'delimiter', ',');
+    dlmwrite(fullfile(predicted_folder, 'barcodes_wo_blanks.csv'), qqct, 'delimiter', ',');
 
     %% Explicitly exit the MATLAB runtime to avoid hanging jobs
     exit;
