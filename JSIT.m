@@ -31,9 +31,9 @@ function [] = JSIT(fov, codebook, predicted_folder)
     % Accumulators for final outputs
     qqt_dict = containers.Map('KeyType', 'char', 'ValueType', 'any');
     qqct_dict = containers.Map('KeyType', 'char', 'ValueType', 'any');
-    xIm_full = zeros(H * sf, W * sf);
-    dIm_full = zeros(H * sf, W * sf);
-    iIm_full = zeros(H * sf, W * sf);
+    %% xIm_full = zeros(H * sf, W * sf);
+    %% dIm_full = zeros(H * sf, W * sf);
+    %% iIm_full = zeros(H * sf, W * sf);
 
     for block_x = 0:numBlocksX-1
         for block_y = 0:numBlocksY-1
@@ -90,11 +90,11 @@ function [] = JSIT(fov, codebook, predicted_folder)
             qqct_dict(key) = qqct;
 
             % Stitch tile into full image
-            y_idx = y_start:y_end;
-            x_idx = x_start:x_end;
-            xIm_full(y_idx, x_idx) = xIm;
-            iIm_full(y_idx, x_idx) = iIm;
-            dIm_full(y_idx, x_idx) = dIm;
+            %% y_idx = y_start:y_end;
+            %% x_idx = x_start:x_end;
+            %% xIm_full(y_idx, x_idx) = xIm;
+            %% iIm_full(y_idx, x_idx) = iIm;
+            %% dIm_full(y_idx, x_idx) = dIm;
         end
     end
 
@@ -124,8 +124,8 @@ function [] = JSIT(fov, codebook, predicted_folder)
         mkdir(predicted_folder);
     end
 
-    imwrite(dIm_full, fullfile(predicted_folder, 'unfiltered_predictions.tiff'));
-    imwrite(iIm_full, fullfile(predicted_folder, 'spot_predictions.tiff'));
+    %% imwrite(dIm_full, fullfile(predicted_folder, 'unfiltered_predictions.tiff'));
+    %% imwrite(iIm_full, fullfile(predicted_folder, 'spot_predictions.tiff'));
     fid = fopen(fullfile(predicted_folder, 'barcodes_with_blanks.csv'), 'w');
     fprintf(fid, 'x,y,barcode_id,spot_area,col5,probability\n');
     fclose(fid);
