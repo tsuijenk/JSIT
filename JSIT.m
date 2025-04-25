@@ -23,6 +23,7 @@ function [] = JSIT(fov, codebook, predicted_folder)
     I = double(Ic{:});
     C = double(Cc{:});
 
+    % Pad image to 2000 x 2000 if needed
     padded_H = 2000;
     padded_W = 2000;
     [H, W, D] = size(I);
