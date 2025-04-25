@@ -23,8 +23,20 @@ function [] = JSIT(fov, codebook, predicted_folder)
     I = double(Ic{:});
     C = double(Cc{:});
 
+    padded_H = 2000;
+    padded_W = 2000;
+    [H, W, D] = size(I);
+    if H < padded_H || W < padded_W
+        padded_I = zeros(padded_H, padded_W, D);
+        padded_I(1:H, 1:W, :) = I;
+        I = padded_I;
+        H = padded_H;
+        W = padded_W;
+        disp(['Image padded to ', num2str(H), ' x ', num2str(W)]);
+    end
+    C = double(Cc{:});
+
     cropSize = 400;  % changed from 402 to 400 for divisibility
-    [H, W, ~] = size(I);
     numBlocksX = ceil(W / cropSize);
     numBlocksY = ceil(H / cropSize);
 
@@ -41,6 +53,11 @@ function [] = JSIT(fov, codebook, predicted_folder)
             y_start = block_y * cropSize + 1;
             x_end = min((block_x + 1) * cropSize, W);
             y_end = min((block_y + 1) * cropSize, H);
+
+            % Skip partial tiles at the edges
+            if (x_end - x_start + 1 < cropSize) || (y_end - y_start + 1 < cropSize) || (x_end > W) || (y_end > H)
+                continue;
+            end
 
             disp(['Decoding block covering image region (X: ', num2str(x_start), '-', num2str(x_end), ', Y: ', num2str(y_start), '-', num2str(y_end), ')']);
 
