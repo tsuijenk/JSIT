@@ -35,7 +35,6 @@ function [] = JSIT(fov, codebook, predicted_folder)
         W = padded_W;
         disp(['Image padded to ', num2str(H), ' x ', num2str(W)]);
     end
-    C = double(Cc{:});
 
     cropSize = 400;  % changed from 402 to 400 for divisibility
     numBlocksX = ceil(W / cropSize);
