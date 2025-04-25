@@ -148,7 +148,7 @@ function [] = JSIT(fov, codebook, predicted_folder)
     fclose(fid);
     dlmwrite(fullfile(predicted_folder, 'barcodes_with_blanks.csv'), qqt_all, '-append');
     fid = fopen(fullfile(predicted_folder, 'barcodes_wo_blanks.csv'), 'w');
-    fprintf(fid, 'x,y,barcode_id,spot_area,col5,probability\n');
+    fprintf(fid, 'x,y,barcode_id,spot_area,contrast,confidence_score\n');
     fclose(fid);
     dlmwrite(fullfile(predicted_folder, 'barcodes_wo_blanks.csv'), qqct_all, '-append');
 
