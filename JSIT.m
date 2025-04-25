@@ -144,7 +144,7 @@ function [] = JSIT(fov, codebook, predicted_folder)
     %% imwrite(dIm_full, fullfile(predicted_folder, 'unfiltered_predictions.tiff'));
     %% imwrite(iIm_full, fullfile(predicted_folder, 'spot_predictions.tiff'));
     fid = fopen(fullfile(predicted_folder, 'barcodes_with_blanks.csv'), 'w');
-    fprintf(fid, 'x,y,barcode_id,spot_area,col5,probability\n');
+    fprintf(fid, 'x,y,barcode_id,spot_area,image_intensity,decoded_signal_strength\n');
     fclose(fid);
     dlmwrite(fullfile(predicted_folder, 'barcodes_with_blanks.csv'), qqt_all, '-append');
     fid = fopen(fullfile(predicted_folder, 'barcodes_wo_blanks.csv'), 'w');
