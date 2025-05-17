@@ -13,7 +13,8 @@ function [] = JSIT(fov, codebook, predicted_folder)
         sf = 2;
         sigma = 0.3;
     else
-        error(['Unknown dataset: ', dataset_name]);
+        sf = 3;
+        sigma = 2.3;
     end
     disp(['Using sf = ', num2str(sf), ', sigma = ', num2str(sigma)]);
 
