@@ -9,6 +9,7 @@ from tifffile import imread
 from concurrent.futures import ThreadPoolExecutor
 from tqdm.auto import tqdm
 from argparse import ArgumentParser
+from typing import Optional
 
 
 '''
@@ -26,26 +27,35 @@ def split_barcode(barcode:str):
     return [int(bit) for bit in barcode.split()]
 
 
-def main(img_folder:str,codebook:str,output_folder:str,*, workers:int = 7):
+def main(img_folder:str,output_folder:str,*, workers:int = 7, codebook: Optional[str] = None):
     if not os.path.exists(output_folder): os.mkdir(output_folder)
     #save Code Book Skip first for rows bc of codebook weirdness
-    c = pd.read_csv(
-        codebook,skiprows=4,header = None
-    )
-    barcodes = c.iloc[:,2].apply(split_barcode)
-    barcodes = np.array([np.array(barcode) for barcode in barcodes])
-    savemat(
-        os.path.join(output_folder,'codebook.mat'),
-        {'ans':barcodes}
-    )
+    
+    if codebook is not None:
+        c = pd.read_csv(
+            codebook,skiprows=4,header = None
+        )
+        barcodes = c.iloc[:,2].apply(split_barcode)
+        barcodes = np.array([np.array(barcode) for barcode in barcodes])
+        savemat(
+            os.path.join(output_folder,'codebook.mat'),
+            {'ans':barcodes}
+        )
+
     print("Converting FOV's to JSIT format")
-    imgs = os.listdir(img_folder)
+    
+    imgs = [f for f in os.listdir(img_folder) 
+            if os.path.isfile(os.path.join(img_folder, f)) and f.lower().endswith(('.tif', '.tiff'))]
+    
     with ThreadPoolExecutor(max_workers=workers) as exec:
+
         jobs  = []
+
         for fov in imgs:
             img = os.path.join(img_folder,fov)
             out = os.path.join(output_folder,fov)
             jobs.append(exec.submit(aligned_jsit,img,out))
+            
         for job in jobs:
             print(job.result())
         
@@ -55,10 +65,10 @@ if __name__ == "__main__":
     if cli: 
         parser = ArgumentParser()
         parser.add_argument('-i',type=str, help="Folder for Restacked Aligned images")
-        parser.add_argument('-c', type=str, help='path to codebook.  Expects similar format to C1E1_codebook.csv')
+        parser.add_argument('-c', type=str, default=None, help='path to codebook.  Expects similar format to C1E1_codebook.csv')
         parser.add_argument('-o', default="JSIT_input",type=str, help="Folder to write images and codebook to")
         args = parser.parse_args()
-        main(args.i,args.c,args.o)
+        main(img_folder=args.i,codebook=args.c,output_folder=args.o)
     else:
         im ="/home/isaac/dev/molonc/gsc/scratch/restacked_aligned"
         cb = "/home/isaac/dev/molonc/gsc/scratch/parameters/codebooks/C1E1_codebook.csv"
