@@ -32,7 +32,8 @@ Ma = A * A'; [~, Sm, ~] = svd(Ma); eM = Sm(1,1);
 A = sparse(A);
 
 %% Pre-process image
-Ystack = double(makeYstack(Ic, s1, s2));
+Ih = imgaussfilt(Ic,0.5)-imgaussfilt(Ic,3);
+Ystack = double(makeYstack(Ih,s1,s2));
 nYs = size(Ystack, 3);
 Xstack = zeros(nYs, (s1 * sf)^2, size(C, 1));
 

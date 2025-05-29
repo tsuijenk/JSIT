@@ -6,17 +6,18 @@ function [] = JSIT(fov, codebook, predicted_folder)
     disp(['Detected dataset: ', dataset_name]);
 
     %% Assign sf and sigma based on dataset
-    if strcmp(dataset_name, 'XP6873')
-        sf = 3;
-        sigma = 2.3;
-    elseif strcmp(dataset_name, 'XP8054')
-        sf = 2;
-        sigma = 0.3;
-    else
-        sf = 3;
-        sigma = 2.3;
-    end
-    disp(['Using sf = ', num2str(sf), ', sigma = ', num2str(sigma)]);
+    %% Set decoding parameters (L0-tuned)
+    sf = 3;
+    sigma = 1.25;
+    s1 = 40;
+    s2 = 40;
+    kmax = 10;
+    lambda = 5;
+    k = 5;
+    t = 0.01;
+    proxOp = 'L0';
+    alpha = 0.02;
+    beta = 200;
 
     %% Load data
     Ic = struct2cell(load(fov));
@@ -47,6 +48,7 @@ function [] = JSIT(fov, codebook, predicted_folder)
     %% xIm_full = zeros(H * sf, W * sf);
     %% dIm_full = zeros(H * sf, W * sf);
     %% iIm_full = zeros(H * sf, W * sf);
+    xIm_full = zeros(H * sf, W * sf);
 
     for block_x = 0:numBlocksX-1
         for block_y = 0:numBlocksY-1
@@ -66,9 +68,6 @@ function [] = JSIT(fov, codebook, predicted_folder)
             sz1 = size(Ic, 1);
             sz2 = size(Ic, 2);
 
-            % Set parameters
-            s1 = 40; s2 = 40; kmax = 10; lambda = 75; k = 1; t = 0;
-
             % Prepare matrices
             A = getPsfMat2(40 * sf, sf, sigma);
             K = C * C'; [~, Sk, ~] = svd(K); eK = Sk(1, 1);
@@ -81,38 +80,48 @@ function [] = JSIT(fov, codebook, predicted_folder)
             nYs = size(Ystack, 3);
             Xstack = zeros(nYs, (s1 * sf)^2, size(C, 1));
 
-            % FISTA decoding
+            %% Run FISTA decoding (L0 mode)
+            fprintf('Running FISTA (L0)...\n');
             for x = 1:nYs
-                Xstack(x, :, :) = codebookFISTA(A, C, Ystack(:, :, x), lambda, kmax, 'SGL', 0.5, [], eK, eM);
+                Ypatch = Ystack(:,:,x);
+                Xstack(x,:,:) = codebookFISTA(A, C, Ypatch, lambda, kmax, proxOp, alpha, beta, eK, eM);
             end
 
             % Postprocess
-            d1 = sz1 / s1; d2 = sz2 / s2;
+            d1 = sz1 / s1; 
+            d2 = sz2 / s2;
             X = processXstack(Xstack, d1, d2, s1 * sf, s1 * sf);
             Xf = enforceSparsity2(X, k, t);
+            
+            %% Debug: Check matrix activity
+            fprintf('Non-zero entries in Xf: %d / %d\n', nnz(Xf), numel(Xf));
+
             xIm = reshape(sum(Xf, 2), [sz1 * sf, sz2 * sf]);
             Icv = reshape(Ic, [sz1 * sz2, size(Ic, 3)]);
             iv = sqrt(sum(double(Icv).^2, 2));
             iIm = reshape(iv, [sz1, sz2]);
             iIm = imresize(iIm, sf);
-            dIm = X2dIm(Xf, sz1 * sf, sz2 * sf);
-            q = dIm2q_ex(dIm, iIm, xIm, 2, C);
+            [dIm, xIm_vals] = X2dIm(Xf, sz1 * sf, sz2 * sf);
+            
+            q = dIm2q_ex(dIm, iIm, xIm_vals, 2, C);
             q(:,1:2) = q(:,1:2) ./ sf;
+            
+            %% Debug: Check transcript calls
+            fprintf('Decoded transcript calls: %d\n', size(q,1));
 
-            % Adaptive filtering
-            nA = 10; nI = 10; nX = 10; nC = 115; nB = 25; tgt = 0.05;
-            [qqt, qqct] = getThresholdHist(q, nA, nI, nX, nC, nB, tgt);
+            %% TEMP: Skip adaptive filtering
+            qqt = q;
+            qqct = q(q(:,4) <= 115, :);
 
             key = sprintf('%d_%d', block_x, block_y);
             qqt_dict(key) = qqt;
             qqct_dict(key) = qqct;
 
             % Stitch tile into full image
-            %% y_idx = y_start:y_end;
-            %% x_idx = x_start:x_end;
-            %% xIm_full(y_idx, x_idx) = xIm;
-            %% iIm_full(y_idx, x_idx) = iIm;
-            %% dIm_full(y_idx, x_idx) = dIm;
+            y_idx = (y_start-1)*sf + 1 : (y_start-1 + sz1)*sf;
+            x_idx = (x_start-1)*sf + 1 : (x_start-1 + sz2)*sf;
+            xIm_full(y_idx, x_idx) = xIm;
+
         end
     end
 
@@ -152,6 +161,22 @@ function [] = JSIT(fov, codebook, predicted_folder)
     fprintf(fid, 'x,y,barcode_id,spot_area,contrast,confidence_score\n');
     fclose(fid);
     dlmwrite(fullfile(predicted_folder, 'barcodes_wo_blanks.csv'), qqct_all, '-append');
+
+    % Normalize xIm_full to [0, 1] and convert to 16-bit
+    xIm_scaled = xIm_full - min(xIm_full(:));
+    xIm_scaled = xIm_scaled / max(xIm_scaled(:));
+    xIm_uint16 = uint16(xIm_scaled * 65535);
+    
+    % Downsample to 2000 x 2000
+    xIm_resized = imresize(xIm_uint16, [2000 2000]);
+    
+    % Save as TIFF
+    tiff_path = fullfile(predicted_folder, 'decoded_intensity_map_uint16.tiff');
+    imwrite(xIm_resized, tiff_path);
+    
+    fprintf('Saved 16-bit decoded transcript map to: %s\n', tiff_path);
+    disp('Decoding complete and outputs saved.');
+
 
     disp('--- All blocks processed and saved ---');
     exit;
