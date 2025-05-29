@@ -74,3 +74,10 @@ if __name__ == "__main__":
         cb = "/home/isaac/dev/molonc/gsc/scratch/parameters/codebooks/C1E1_codebook.csv"
         main(im,cb,'xp6873')
 
+
+    """
+    python aligned_stack_jsit.py -i "/projects/molonc/scratch/jtsui/XP8054/serval_restacked_aligned_preprocessed_images" -o "/projects/molonc/scratch/jtsui/JSIT_experiment/reformatted_for_JSIT/XP8054/restacked_aligned_preprocessed"
+    
+    python aligned_stack_jsit.py -i "/projects/molonc/roth_lab/jtsui/XP6873/serval_restacked_aligned_preprocessed_images" -o "/projects/molonc/scratch/jtsui/JSIT_experiment/reformatted_for_JSIT/XP6873/restacked_aligned_preprocessed"
+
+    """
