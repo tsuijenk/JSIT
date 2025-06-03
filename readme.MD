@@ -24,7 +24,7 @@ This will generate the following files:
 
 - `JSIT` — the compiled executable
 - `JSIT.ctf` — compressed code archive (required at runtime)
-- `run_run_JSIT_wrapper.sh` — helper script to run with MATLAB Runtime
+- `run_JSIT_preproc_wrapper.sh` — helper script to run with MATLAB Runtime
 - Other supporting files like `readme.txt` and `requiredMCRProducts.txt`
 
 >  Make sure `JSIT.ctf` is **in the same directory** as `JSIT` and `run_JSIT_preproc_wrapper.sh`.
