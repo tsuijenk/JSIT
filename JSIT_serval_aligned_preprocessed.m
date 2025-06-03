@@ -1,4 +1,4 @@
-function [] = JSIT(fov, codebook, predicted_folder)
+function [] = JSIT_serval_aligned_preprocessed(fov, codebook, predicted_folder)
 
     %% Extract dataset name from FOV path
     [path_to_fov, ~, ~] = fileparts(fov);

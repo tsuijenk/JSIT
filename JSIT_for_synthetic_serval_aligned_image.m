@@ -33,7 +33,7 @@ A = sparse(A);
 
 %% Pre-process image
 Ih = imgaussfilt(Ic,0.5)-imgaussfilt(Ic,3);
-Ystack = double(makeYstack(Ih,s1,s2));
+Ystack = double(makeYstack(Ih, s1, s2));
 nYs = size(Ystack, 3);
 Xstack = zeros(nYs, (s1 * sf)^2, size(C, 1));
 
