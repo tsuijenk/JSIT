@@ -15,8 +15,10 @@ These instructions are tailored for the environment on the **"numbers" cluster**
 From the directory `/path/to/JSIT` where `JSIT.m` is located, run:
 
 ```bash
-/gsc/software/linux-x86_64-centos6/matlab-r2016a/bin/mcc -m run_JSIT_wrapper.m
+/gsc/software/linux-x86_64-centos6/matlab-r2016a/bin/mcc -m JSIT_preproc_wrapper.m
 ```
+
+Users should use JSIT_preproc_wrapper.m because JSIT expects some kind of fiducial alignment and preprocessing. Ignore JSIT_raw_wrapper.m.
 
 This will generate the following files:
 
@@ -25,7 +27,7 @@ This will generate the following files:
 - `run_run_JSIT_wrapper.sh` — helper script to run with MATLAB Runtime
 - Other supporting files like `readme.txt` and `requiredMCRProducts.txt`
 
->  Make sure `JSIT.ctf` is **in the same directory** as `JSIT` and `run_run_JSIT_wrapper.sh`.
+>  Make sure `JSIT.ctf` is **in the same directory** as `JSIT` and `run_JSIT_preproc_wrapper.sh`.
 
 ---
 
@@ -42,7 +44,7 @@ $MCRROOT/v901/sys/os/glnxa64:\
 $MCRROOT/v901/sys/opengl/lib/glnxa64:$LD_LIBRARY_PATH
 ```
 
-> These are set automatically when using `run_run_JSIT_wrapper.sh` — no need to export manually in SLURM.
+> These are set automatically when using `run_JSIT_preproc_wrapper.sh` — no need to export manually in SLURM.
 
 ---
 
@@ -51,7 +53,7 @@ $MCRROOT/v901/sys/opengl/lib/glnxa64:$LD_LIBRARY_PATH
 Run the program using:
 
 ```bash
-/path/to/JSIT/run_run_JSIT_wrapper.sh /gsc/software/linux-x86_64-centos6/matlab-r2016a \
+/path/to/JSIT/run_JSIT_preproc_wrapper.sh /gsc/software/linux-x86_64-centos6/matlab-r2016a \
   /path/to/aligned_images_{fov:03}_{z:02}.tiff.mat \
   /path/to/codebook.mat \
   /path/to/output_folder_{fov:03}_{z:02}
@@ -66,7 +68,7 @@ Run the program using:
 
 ### Notes (1)
 
-- Do **not** run `./JSIT` directly — use `run_run_JSIT_wrapper.sh`
+- Do **not** run `./JSIT` directly — use `run_JSIT_preproc_wrapper.sh`
 - You **do not need a MATLAB license** to run after compilation
 - Make sure all input/output paths are accessible from compute nodes
 - If you see a `CTF not found` error, make sure `JSIT.ctf` is in the same directory as `JSIT`
